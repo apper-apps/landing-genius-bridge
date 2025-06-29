@@ -85,7 +85,6 @@ const handleLogout = async () => {
 
                   {/* User Menu */}
                   <div className="relative group">
-                    <button className="flex items-center space-x-2 bg-white hover:bg-slate-50 px-3 py-2 rounded-lg border border-slate-200 transition-colors">
 <button className="flex items-center space-x-2 bg-white hover:bg-slate-50 px-3 py-2 rounded-lg border border-slate-200 transition-colors">
                       <div className="w-6 h-6 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-full flex items-center justify-center">
                         <span className="text-xs font-semibold text-white">
@@ -93,6 +92,7 @@ const handleLogout = async () => {
                         </span>
                       </div>
                       <span className="hidden sm:block text-sm font-medium text-slate-700">{user.firstName || user.name}</span>
+                    </button>
                     
                     {/* Dropdown */}
                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-slate-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
