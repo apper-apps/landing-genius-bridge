@@ -1,0 +1,11 @@
+[
+  {
+    "Id": 1,
+    "name": "Demo User",
+    "email": "demo@landinggenius.com",
+    "wa_number": "081234567890",
+    "token_balance": 15,
+    "subscription_status": "active",
+    "created_at": "2024-01-15T10:00:00.000Z"
+  }
+]

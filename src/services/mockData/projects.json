@@ -1,0 +1,16 @@
+[
+  {
+    "Id": 1,
+    "user_id": 1,
+    "product_name": "Nasi Gudeg Bu Sari",
+    "target_market": "Pekerja kantoran Jakarta yang suka makanan tradisional",
+    "benefits": "Rasa autentik Jogja, higienis, delivery cepat dalam 30 menit, harga terjangkau mulai 15rb",
+    "selected_problem": "Harga Makanan Mahal Tapi Porsi Kecil",
+    "pattern_interrupt": "STOP! Jangan sampai Anda jadi korban makanan mahal porsi kecil...",
+    "html_code": "<html>Landing page content...</html>",
+    "status": "published",
+    "public_url": "nasi-gudeg-bu-sari-jakarta",
+    "created_at": "2024-01-15T12:00:00.000Z",
+    "updated_at": "2024-01-16T10:00:00.000Z"
+  }
+]
