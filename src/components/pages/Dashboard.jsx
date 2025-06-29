@@ -1,20 +1,23 @@
-import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { toast } from 'react-toastify';
-import Button from '@/components/atoms/Button';
-import Loading from '@/components/ui/Loading';
-import Error from '@/components/ui/Error';
-import Empty from '@/components/ui/Empty';
-import ApperIcon from '@/components/ApperIcon';
-import { getUserProjects, deleteProject } from '@/services/api/projectService';
-import { useSelector } from 'react-redux';
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { toast } from "react-toastify";
+import { deleteLandingPage, getAllLandingPages } from "@/services/api/landingPageService";
+import ApperIcon from "@/components/ApperIcon";
+import Button from "@/components/atoms/Button";
+import Error from "@/components/ui/Error";
+import Empty from "@/components/ui/Empty";
+import Loading from "@/components/ui/Loading";
+import { deleteProject, getUserProjects } from "@/services/api/projectService";
+import { useSelector } from "react-redux";
 
 const Dashboard = () => {
-const navigate = useNavigate();
+  const navigate = useNavigate();
   const { user, isAuthenticated } = useSelector((state) => state.user);
-  const [projects, setProjects] = useState([]);
+const [projects, setProjects] = useState([]);
+  const [landingPages, setLandingPages] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [landingPagesLoading, setLandingPagesLoading] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -36,17 +39,44 @@ const checkAuthAndLoadData = async () => {
     }
   };
 
-  const loadProjects = async (userId) => {
+const loadProjects = async (userId) => {
     setLoading(true);
     setError('');
 
     try {
       const userProjects = await getUserProjects(userId);
       setProjects(userProjects);
+      await loadLandingPages();
     } catch (error) {
       setError('Gagal memuat project');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadLandingPages = async () => {
+    setLandingPagesLoading(true);
+    try {
+      const allLandingPages = await getAllLandingPages();
+      setLandingPages(allLandingPages);
+    } catch (error) {
+      console.error('Gagal memuat landing pages:', error);
+    } finally {
+      setLandingPagesLoading(false);
+    }
+  };
+
+  const handleDeleteLandingPage = async (landingPageId) => {
+    if (!window.confirm('Yakin ingin menghapus landing page ini?')) {
+      return;
+    }
+
+    try {
+      await deleteLandingPage(landingPageId);
+      setLandingPages(prev => prev.filter(lp => lp.Id !== landingPageId));
+      toast.success('Landing page berhasil dihapus');
+    } catch (error) {
+      toast.error('Gagal menghapus landing page');
     }
   };
 
@@ -166,8 +196,9 @@ onRetry={() => loadProjects(user?.userId)}
           </div>
 
           {/* Stats */}
+{/* Stats */}
           <div className="p-8 border-b border-slate-200">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
               <div className="text-center">
                 <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3">
                   <ApperIcon name="Layout" className="h-6 w-6 text-blue-600" />
@@ -195,16 +226,23 @@ onRetry={() => loadProjects(user?.userId)}
                 </div>
                 <div className="text-sm text-slate-600">Draft</div>
               </div>
+
+              <div className="text-center">
+                <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <ApperIcon name="FileText" className="h-6 w-6 text-indigo-600" />
+                </div>
+                <div className="text-2xl font-bold text-slate-900">{landingPages.length}</div>
+                <div className="text-sm text-slate-600">Landing Pages</div>
+              </div>
               
               <div className="text-center">
                 <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-3">
                   <ApperIcon name="Coins" className="h-6 w-6 text-purple-600" />
                 </div>
-<div className="text-2xl font-bold text-slate-900">{user?.tokenBalance || 0}</div>
+                <div className="text-2xl font-bold text-slate-900">{user?.tokenBalance || 0}</div>
                 <div className="text-sm text-slate-600">Token Tersisa</div>
               </div>
             </div>
-          </div>
 
           {/* Quick Actions */}
           <div className="p-8">
@@ -252,12 +290,12 @@ onRetry={() => loadProjects(user?.userId)}
           </div>
         </motion.div>
 
-        {/* Projects List */}
+{/* Projects List */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden"
+          className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden mb-8"
         >
           <div className="px-8 py-6 border-b border-slate-200">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between">
@@ -266,7 +304,7 @@ onRetry={() => loadProjects(user?.userId)}
                   Landing Page Projects
                 </h2>
                 <p className="text-slate-600 text-sm mt-1">
-                  Kelola semua landing page dan iklan yang telah Anda buat
+                  Kelola semua project landing page yang telah Anda buat
                 </p>
               </div>
               <div className="mt-4 md:mt-0">
@@ -341,6 +379,104 @@ onRetry={() => loadProjects(user?.userId)}
                         variant="ghost"
                         icon="Trash2"
                         onClick={() => handleDeleteProject(project.Id)}
+                        className="text-red-600 hover:bg-red-50"
+                      />
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </div>
+        </motion.div>
+
+        {/* Landing Pages List */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden"
+        >
+          <div className="px-8 py-6 border-b border-slate-200">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+              <div>
+                <h2 className="text-xl font-semibold text-slate-800">
+                  Landing Pages
+                </h2>
+                <p className="text-slate-600 text-sm mt-1">
+                  Kelola semua landing page yang telah dibuat dari project Anda
+                </p>
+              </div>
+              <div className="mt-4 md:mt-0">
+                <Button variant="outline" icon="Plus" size="sm">
+                  Add Landing Page
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-8">
+            {landingPagesLoading ? (
+              <Loading type="default" />
+            ) : landingPages.length === 0 ? (
+              <Empty
+                type="dashboard"
+                title="Belum Ada Landing Page"
+                description="Landing page akan muncul otomatis saat Anda mempublish project. Atau buat landing page kustom sesuai kebutuhan Anda."
+                icon="FileText"
+                actionLabel="Buat Landing Page"
+                onAction={() => navigate('/mulai')}
+              />
+            ) : (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {landingPages.map((landingPage, index) => (
+                  <motion.div
+                    key={landingPage.Id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-xl p-6 card-hover"
+                  >
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center">
+                        <ApperIcon name="FileText" className="h-6 w-6 text-white" />
+                      </div>
+                      <div className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
+                        Landing Page
+                      </div>
+                    </div>
+
+                    <h3 className="font-semibold text-slate-800 mb-2 line-clamp-2">
+                      {landingPage.page_title || 'Untitled Landing Page'}
+                    </h3>
+                    
+                    <p className="text-sm text-slate-600 mb-4 line-clamp-2">
+                      {landingPage.project?.Name || 'No project assigned'}
+                    </p>
+
+                    <div className="flex items-center justify-between text-sm text-slate-500 mb-4">
+                      <span>Dibuat {formatDate(landingPage.CreatedOn)}</span>
+                      {landingPage.url && (
+                        <a 
+                          href={`/lp/${landingPage.url}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary-600 hover:text-primary-700"
+                        >
+                          <ApperIcon name="ExternalLink" className="h-4 w-4" />
+                        </a>
+                      )}
+                    </div>
+
+                    <div className="flex space-x-2">
+                      <Button size="sm" variant="outline" icon="Edit" className="flex-1">
+                        Edit
+                      </Button>
+                      
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        icon="Trash2"
+                        onClick={() => handleDeleteLandingPage(landingPage.Id)}
                         className="text-red-600 hover:bg-red-50"
                       />
                     </div>

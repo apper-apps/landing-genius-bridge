@@ -59,15 +59,25 @@ const handleLogout = async () => {
                   >
                     Beranda
                   </Link>
-                  {user && (
-                    <Link 
-                      to="/dashboard" 
-                      className={`text-sm font-medium transition-colors hover:text-primary-600 ${
-                        location.pathname === '/dashboard' ? 'text-primary-600' : 'text-slate-600'
-                      }`}
-                    >
-                      Dashboard
-                    </Link>
+{user && (
+                    <>
+                      <Link 
+                        to="/dashboard" 
+                        className={`text-sm font-medium transition-colors hover:text-primary-600 ${
+                          location.pathname === '/dashboard' ? 'text-primary-600' : 'text-slate-600'
+                        }`}
+                      >
+                        Dashboard
+                      </Link>
+                      <Link 
+                        to="/landing-pages" 
+                        className={`text-sm font-medium transition-colors hover:text-primary-600 ${
+                          location.pathname === '/landing-pages' ? 'text-primary-600' : 'text-slate-600'
+                        }`}
+                      >
+                        Landing Pages
+                      </Link>
+                    </>
                   )}
                 </>
               )}
