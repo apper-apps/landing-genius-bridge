@@ -1,29 +1,26 @@
-import { Outlet, useLocation, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import ApperIcon from '@/components/ApperIcon';
-import { useState, useEffect } from 'react';
+import { Link, Outlet, useLocation } from "react-router-dom";
+import { motion } from "framer-motion";
+import React, { useContext, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { AuthContext } from "@/App";
+import ApperIcon from "@/components/ApperIcon";
+import Dashboard from "@/components/pages/Dashboard";
 
 const Layout = () => {
   const location = useLocation();
-  const [user, setUser] = useState(null);
+  const { user, isAuthenticated } = useSelector((state) => state.user);
+const { logout } = useContext(AuthContext);
   const [tokenBalance, setTokenBalance] = useState(0);
-
   useEffect(() => {
-    // Check if user is logged in
-    const userData = localStorage.getItem('user');
-    if (userData) {
-      const parsedUser = JSON.parse(userData);
-      setUser(parsedUser);
-      setTokenBalance(parsedUser.token_balance || 0);
+    if (user) {
+      setTokenBalance(user.tokenBalance || 0);
     }
-  }, [location]);
+  }, [user]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('authToken');
-    setUser(null);
-    setTokenBalance(0);
-    window.location.href = '/';
+const handleLogout = async () => {
+    if (logout) {
+      await logout();
+    }
   };
 
   const isWizardStep = ['/mulai', '/masalah', '/pattern', '/preview', '/daftar'].includes(location.pathname);
@@ -77,8 +74,8 @@ const Layout = () => {
             </nav>
 
             {/* User Actions */}
-            <div className="flex items-center space-x-4">
-              {user ? (
+<div className="flex items-center space-x-4">
+              {isAuthenticated && user ? (
                 <div className="flex items-center space-x-4">
                   {/* Token Balance */}
                   <div className="hidden sm:flex items-center space-x-2 bg-gradient-to-r from-accent-50 to-accent-100 px-3 py-2 rounded-lg">
@@ -89,14 +86,13 @@ const Layout = () => {
                   {/* User Menu */}
                   <div className="relative group">
                     <button className="flex items-center space-x-2 bg-white hover:bg-slate-50 px-3 py-2 rounded-lg border border-slate-200 transition-colors">
+<button className="flex items-center space-x-2 bg-white hover:bg-slate-50 px-3 py-2 rounded-lg border border-slate-200 transition-colors">
                       <div className="w-6 h-6 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-full flex items-center justify-center">
                         <span className="text-xs font-semibold text-white">
-                          {user.name?.charAt(0)?.toUpperCase() || 'U'}
+                          {(user.firstName || user.name)?.charAt(0)?.toUpperCase() || 'U'}
                         </span>
                       </div>
-                      <span className="hidden sm:block text-sm font-medium text-slate-700">{user.name}</span>
-                      <ApperIcon name="ChevronDown" className="h-4 w-4 text-slate-400" />
-                    </button>
+                      <span className="hidden sm:block text-sm font-medium text-slate-700">{user.firstName || user.name}</span>
                     
                     {/* Dropdown */}
                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-slate-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">

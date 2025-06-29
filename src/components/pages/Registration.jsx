@@ -6,7 +6,7 @@ import StepIndicator from '@/components/molecules/StepIndicator';
 import Input from '@/components/atoms/Input';
 import Button from '@/components/atoms/Button';
 import ApperIcon from '@/components/ApperIcon';
-import { createUser } from '@/services/api/userService';
+import { create as createUser } from '@/services/api/userService';
 
 const Registration = () => {
   const navigate = useNavigate();
@@ -166,7 +166,7 @@ const Registration = () => {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     
-    try {
+try {
       const userData = {
         name: formData.name,
         email: formData.email,
@@ -175,12 +175,9 @@ const Registration = () => {
         selectedPackage: formData.selectedPackage,
         token_balance: packages.find(p => p.id === formData.selectedPackage)?.tokens || 0
       };
-
       const user = await createUser(userData);
-      
-      // Save user session
-      localStorage.setItem('user', JSON.stringify(user));
-      localStorage.setItem('authToken', 'demo-token-' + Date.now());
+// User will be automatically logged in via ApperUI after successful registration
+      // The authentication flow is handled by the App component's onSuccess handler
       
       toast.success('Registrasi berhasil! Selamat datang di LandingGenius 🎉');
       

@@ -8,10 +8,11 @@ import Error from '@/components/ui/Error';
 import Empty from '@/components/ui/Empty';
 import ApperIcon from '@/components/ApperIcon';
 import { getUserProjects, deleteProject } from '@/services/api/projectService';
+import { useSelector } from 'react-redux';
 
 const Dashboard = () => {
-  const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+const navigate = useNavigate();
+  const { user, isAuthenticated } = useSelector((state) => state.user);
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -20,19 +21,15 @@ const Dashboard = () => {
     checkAuthAndLoadData();
   }, []);
 
-  const checkAuthAndLoadData = async () => {
+const checkAuthAndLoadData = async () => {
     try {
-      const userData = localStorage.getItem('user');
-      if (!userData) {
+      if (!isAuthenticated || !user) {
         toast.error('Silakan login terlebih dahulu');
-        navigate('/masuk');
+        navigate('/login');
         return;
       }
-
-      const parsedUser = JSON.parse(userData);
-      setUser(parsedUser);
       
-      await loadProjects(parsedUser.Id);
+      await loadProjects(user.userId);
     } catch (error) {
       setError('Gagal memuat data dashboard');
       setLoading(false);
@@ -126,7 +123,7 @@ const Dashboard = () => {
             <Error
               message="Gagal Memuat Dashboard"
               description={error}
-              onRetry={() => loadProjects(user?.Id)}
+onRetry={() => loadProjects(user?.userId)}
             />
           </div>
         </div>
@@ -146,8 +143,8 @@ const Dashboard = () => {
           <div className="bg-gradient-to-r from-primary-500 to-secondary-500 px-8 py-6">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between">
               <div>
-                <h1 className="text-2xl md:text-3xl font-display font-bold text-white mb-2">
-                  Selamat datang, {user?.name}! 👋
+<h1 className="text-2xl md:text-3xl font-display font-bold text-white mb-2">
+                  Selamat datang, {user?.firstName || user?.name}! 👋
                 </h1>
                 <p className="text-primary-100">
                   Kelola semua landing page dan kampanye iklan Anda dari sini
@@ -203,7 +200,7 @@ const Dashboard = () => {
                 <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-3">
                   <ApperIcon name="Coins" className="h-6 w-6 text-purple-600" />
                 </div>
-                <div className="text-2xl font-bold text-slate-900">{user?.token_balance || 0}</div>
+<div className="text-2xl font-bold text-slate-900">{user?.tokenBalance || 0}</div>
                 <div className="text-sm text-slate-600">Token Tersisa</div>
               </div>
             </div>
