@@ -240,9 +240,10 @@ onRetry={() => loadProjects(user?.userId)}
                   <ApperIcon name="Coins" className="h-6 w-6 text-purple-600" />
                 </div>
                 <div className="text-2xl font-bold text-slate-900">{user?.tokenBalance || 0}</div>
-                <div className="text-sm text-slate-600">Token Tersisa</div>
+<div className="text-sm text-slate-600">Token Tersisa</div>
               </div>
             </div>
+          </div>
 
           {/* Quick Actions */}
           <div className="p-8">
